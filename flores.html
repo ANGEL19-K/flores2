@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Flores Amarillas &lt;3</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Inclusive Sans', sans-serif;
+            background: linear-gradient(70deg, blue, purple, pink);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 100px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .Con-2 {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+        }
+
+        canvas {
+            display: block;
+        }
+
+        .Contenedor {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+        }
+
+        .Con {
+            display: flex;
+            place-content: center;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .Texto {
+            display: none;
+            position: absolute;
+            bottom: 50px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .Texto h2 {
+            font-size: 50px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 10px 20px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        #B12 {
+            margin-left: 30px;
+        }
+
+        .Button{
+            font-family: monospace;
+            font-size: x-large;
+            transition-duration: 0.2s;
+            padding: 10px;
+            border-radius: 8px;
+            background-color: greenyellow; 
+            color: black; 
+            border: 2px solid green;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        .Button:hover{
+            transform: scale(1.1);
+            border-radius: 14px;
+            box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+            color: black;
+            background-color: white;
+        }
+
+        .Contenedor-Binicio {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .Con-Emergente{
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            display: none;
+            justify-content: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .cua{
+            display: none;
+            position: relative;
+            margin: auto;
+            width: 300px;
+            padding: 30px;
+            background-color: #f9f9f9;
+            border: 2px solid greenyellow;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            animation: aparecer 0.5s ease-out;
+        }
+
+        /* Contenedor para la imagen personalizada - inicialmente oculto */
+        .contenedor-imagen {
+            display: none;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 5px solid #fff;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+            z-index: 100;
+            animation: aparecer 1s ease-out;
+        }
+        
+        .imagen-personalizada {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Estilos para el reproductor de música */
+        .reproductor-musica {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background-color: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 50px;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+        }
+        
+        .reproductor-musica.activo {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: all;
+        }
+        
+        .reproductor-musica:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .boton-musica {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .boton-musica:hover {
+            transform: scale(1.1);
+            background: greenyellow;
+        }
+        
+        .boton-musica i {
+            font-size: 20px;
+            color: #333;
+        }
+        
+        .info-musica {
+            color: white;
+            font-size: 14px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            max-width: 0;
+            overflow: hidden;
+            transition: max-width 0.5s ease, opacity 0.5s ease;
+            opacity: 0;
+            white-space: nowrap;
+        }
+        
+        .reproductor-musica.mostrar-texto .info-musica {
+            max-width: 200px;
+            opacity: 1;
+            margin-right: 10px;
+        }
+        
+        .control-volumen {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 0;
+            width: 0;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .reproductor-musica.mostrar-volumen .control-volumen {
+            opacity: 1;
+            width: 100px;
+        }
+        
+        .control-volumen input {
+            width: 100%;
+            cursor: pointer;
+        }
+        
+        /* Opciones de música */
+        .opciones-musica {
+            display: none;
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 999;
+            text-align: center;
+            animation: aparecer 0.5s ease-out;
+        }
+        
+        .opciones-musica h3 {
+            margin: 0 0 10px 0;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+        
+        .opciones-botones {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        @keyframes aparecer {
+            0% {
+              opacity: 0;
+              transform: translateY(-20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+              }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 50px;
+            }
+            
+            .Texto h2 {
+                font-size: 30px;
+            }
+            
+            .Button {
+                font-size: large;
+                padding: 8px;
+            }
+            
+            .Con {
+                flex-direction: column;
+            }
+            
+            #B12 {
+                margin-left: 0;
+                margin-top: 15px;
+            }
+            
+            .contenedor-imagen {
+                width: 120px;
+                height: 120px;
+                top: 10px;
+                right: 10px;
+            }
+            
+            .reproductor-musica {
+                bottom: 10px;
+                left: 10px;
+                padding: 8px 12px;
+            }
+            
+            .boton-musica {
+                width: 35px;
+                height: 35px;
+            }
+            
+            .opciones-musica {
+                width: 90%;
+                bottom: 70px;
+            }
+        }
+
+        @media (max-width: 468px) {
+            body {
+                background: linear-gradient(100deg, blue, purple, pink);
+            }
+            
+            h1 {
+                font-size: 40px;
+            }
+            
+            .Texto h2 {
+                font-size: 24px;
+            }
+            
+            .cua {
+                width: 80%;
+                padding: 20px;
+            }
+            
+            .contenedor-imagen {
+                width: 100px;
+                height: 100px;
+                top: 5px;
+                right: 5px;
+            }
+            
+            .reproductor-musica {
+                border-radius: 35px;
+                padding: 6px 10px;
+            }
+            
+            .info-musica {
+                font-size: 12px;
+            }
+            
+            .opciones-musica {
+                width: 85%;
+                padding: 10px;
+            }
+            
+            .opciones-botones {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inclusive+Sans:ital@1&display=swap" rel="stylesheet">
+    <!-- Iconos para el reproductor -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Contenedor para la imagen personalizada -->
+    <div class="contenedor-imagen" id="contenedor-imagen">
+        <img id="imagen-personalizada" class="imagen-personalizada"
+             src="https://i.pinimg.com/736x/ad/78/b7/ad78b7217a5c7aa28edc66ffcc054af2.jpg"
+             alt="Imagen personalizada">
+    </div>
+
+    <!-- Reproductor de música -->
+    <div class="reproductor-musica" id="reproductor-musica">
+        <button class="boton-musica" id="boton-play">
+            <i class="fas fa-play"></i>
+        </button>
+        <div class="info-musica" id="info-musica">
+            Reproduciendo: Flores Amarillas
+        </div>
+        <div class="control-volumen" id="control-volumen">
+            <i class="fas fa-volume-up" style="color: white;"></i>
+            <input type="range" id="volumen" min="0" max="1" step="0.1" value="0.5">
+        </div>
+    </div>
+    
+    <!-- Opciones de música -->
+    <div class="opciones-musica" id="opciones-musica">
+        <h3>¿Quieres escuchar música?</h3>
+        <div class="opciones-botones">
+            <button class="Button" id="btn-musica-si">Sí, por favor</button>
+            <button class="Button" id="btn-musica-no">No, gracias</button>
+        </div>
+    </div>
+
+    <div class="Contenedor-Binicio">
+        <button class="Button" id="BVer"> Clicka aqui </button>
+    </div>
+
+    <div class="Con-Emergente">
+        <div id="resultado" class="cua">
+            <p id="res">
+                ¡Feliz 21 de septiembre! 🌼 Que estas flores amarillas iluminen tu día, con cariño de tu amigo Ángel. &lt;3
+            </p>    
+            <button id="BotonCerrar" class="Button">Cerrar</button>
+        </div>
+    </div>
+
+    <div class="Con-2">
+        <h1 id="Titulo"> Elije una Opcion </h1>
+        <div class="Con">
+            <button class="Button" id="B1"> 1 Flor </button>
+            <button class="Button" id="B12"> 12 Flores :) </button>
+        </div>
+    </div>
+
+    <main class="Contenedor">
+        <canvas id="Flor" class="Flor" width="800" height="600"></canvas>
+
+        <div class="Texto">
+            <h2 id="Text">¡Feliz 21, Día de las Flores! Espero que estas flores sean de tu agrado y te alegren el día.</h2>
+        </div>
+
+    </main>
+
+    <!-- Elemento de audio (oculto) - MODIFICADO PARA USAR ARCHIVO LOCAL -->
+    <audio id="audio-player" loop>
+        <source src="FLORES.mp3" type="audio/mpeg">
+        Tu navegador no soporta el elemento de audio.
+    </audio>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const contenedorImagen = document.getElementById('contenedor-imagen');
+            const audioPlayer = document.getElementById('audio-player');
+            const botonPlay = document.getElementById('boton-play');
+            const controlVolumen = document.getElementById('control-volumen');
+            const volumenSlider = document.getElementById('volumen');
+            const reproductorMusica = document.getElementById('reproductor-musica');
+            const infoMusica = document.getElementById('info-musica');
+            const opcionesMusica = document.getElementById('opciones-musica');
+            const btnMusicaSi = document.getElementById('btn-musica-si');
+            const btnMusicaNo = document.getElementById('btn-musica-no');
+            
+            let musicaReproduciendo = false;
+            let musicaActivada = false;
+            
+            // Configurar evento para el botón de play/pausa
+            botonPlay.addEventListener('click', function() {
+                if (!musicaActivada) return;
+                
+                if (musicaReproduciendo) {
+                    audioPlayer.pause();
+                    botonPlay.innerHTML = '<i class="fas fa-play"></i>';
+                    reproductorMusica.classList.remove('mostrar-texto');
+                    setTimeout(() => {
+                        infoMusica.textContent = "Música pausada";
+                        reproductorMusica.classList.add('mostrar-texto');
+                    }, 10);
+                } else {
+                    audioPlayer.play().catch(e => {
+                        console.log("Error al reproducir:", e);
+                    });
+                    botonPlay.innerHTML = '<i class="fas fa-pause"></i>';
+                    reproductorMusica.classList.remove('mostrar-texto');
+                    setTimeout(() => {
+                        infoMusica.textContent = "Reproduciendo: Flores Amarillas";
+                        reproductorMusica.classList.add('mostrar-texto');
+                    }, 10);
+                }
+                musicaReproduciendo = !musicaReproduciendo;
+            });
+            
+            // Control de volumen
+            volumenSlider.addEventListener('input', function() {
+                audioPlayer.volume = this.value;
+            });
+            
+            // Mostrar controles de volumen al pasar el mouse
+            reproductorMusica.addEventListener('mouseenter', function() {
+                this.classList.add('mostrar-volumen');
+            });
+            
+            reproductorMusica.addEventListener('mouseleave', function() {
+                this.classList.remove('mostrar-volumen');
+            });
+            
+            // Opciones de música
+            btnMusicaSi.addEventListener('click', function() {
+                opcionesMusica.style.display = 'none';
+                reproductorMusica.classList.add('activo');
+                musicaActivada = true;
+                
+                // Iniciar reproducción
+                audioPlayer.play().catch(e => {
+                    console.log("La reproducción automática fue prevenida:", e);
+                    // Si falla la reproducción automática, mostramos instrucción para el usuario
+                    reproductorMusica.classList.remove('mostrar-texto');
+                    setTimeout(() => {
+                        infoMusica.textContent = "Click para reproducir música";
+                        reproductorMusica.classList.add('mostrar-texto');
+                    }, 10);
+                });
+                botonPlay.innerHTML = '<i class="fas fa-pause"></i>';
+                musicaReproduciendo = true;
+            });
+            
+            btnMusicaNo.addEventListener('click', function() {
+                opcionesMusica.style.display = 'none';
+                // No hacemos nada, la música permanece desactivada
+            });
+
+            document.getElementById("BVer").addEventListener('click', function() {
+                document.querySelector(".Con-Emergente").style.display = "flex";
+                document.getElementById("resultado").style.display = "block";
+            });
+
+            document.getElementById("BotonCerrar").addEventListener('click', function() {
+                document.querySelector(".Con-Emergente").style.display = "none";
+                document.querySelector(".Contenedor-Binicio").style.display = "none";
+                document.querySelector(".Con-2").style.display = "block";
+            });
+
+            let Titulo = document.title;
+            window.addEventListener('blur', () => {
+                Titulo = document.title;
+                document.title = "No te vallas, regresa :(";
+            });
+            window.addEventListener('focus', () => {
+                document.title = Titulo;
+            });
+
+            let h1 = document.getElementById("Titulo");
+            let Boton1 = document.getElementById("B1");
+            
+            Boton1.addEventListener('click', function() {
+                const ContenedorBotones = document.querySelector(".Con");
+                document.querySelector(".Texto").style.display = "block";
+                ContenedorBotones.style.display = "none";
+                contenedorImagen.style.display = "block";
+                DibujarFlor(400, 300, 6, 30, 100, 200);
+                h1.remove();
+                
+                // Mostrar opciones de música después de elegir 1 flor
+                setTimeout(() => {
+                    opcionesMusica.style.display = 'block';
+                }, 500);
+            });
+
+            document.getElementById("B12").addEventListener('click', function() {
+                const ContenedorBotones = document.querySelector(".Con");
+                ContenedorBotones.style.display = "none";
+                document.querySelector(".Texto").style.display = "block";
+                contenedorImagen.style.display = "block";
+                CrearVarias();
+                h1.remove();
+                
+                // Mostrar opciones de música después de elegir 12 flores
+                setTimeout(() => {
+                    opcionesMusica.style.display = 'block';
+                }, 500);
+            });
+
+            const canvas = document.getElementById('Flor');
+            const ctx = canvas.getContext('2d');
+
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            function DibujarPetalo(x, y, RadioX, scala, Rotacion, color, pasos) {
+                const Numero = scala;
+                const AnguloIncrement = (Math.PI / pasos) * 2;
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate(Rotacion);
+                ctx.scale(1, Numero);
+                ctx.beginPath();
+                for (let i = 0; i <= pasos; i++) {
+                    const AnguloActual = i * AnguloIncrement;
+                    const currentRadius = Math.sin(AnguloActual) * RadioX;
+                    const PuntoY = Math.sin(AnguloActual) * currentRadius;
+                    const PuntoX = Math.cos(AnguloActual) * currentRadius;
+                    if (i === 0) {
+                        ctx.moveTo(PuntoX, PuntoY);
+                    } else {
+                        ctx.lineTo(PuntoX, PuntoY);
+                    }
+                }
+                ctx.strokeStyle = color;
+                ctx.fillStyle = color;
+                ctx.fill();
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            function DibujarFlor(x, y, NumeroPetalos, RadioXPetalo, RadioYPetalo, AltoTrazo) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.lineTo(x, y + AltoTrazo);
+                ctx.lineWidth = 5;
+                ctx.strokeStyle = 'green';
+                ctx.stroke();
+
+                DibujarPetalo(x - 20, y + AltoTrazo/2, 15, 2, -Math.PI/4, 'green', 30);
+                DibujarPetalo(x + 20, y + AltoTrazo/1.5, 15, 2, Math.PI/4, 'green', 30);
+
+                const AnguloIncrement = (Math.PI * 2) / NumeroPetalos;
+                for (let i = 0; i < NumeroPetalos; i++) {
+                    const Angulo = i * AnguloIncrement;
+                    DibujarPetalo(x, y, RadioXPetalo, 1.5, Angulo, 'yellow', 30);
+                }
+
+                ctx.beginPath();
+                ctx.arc(x, y, 15, 0, Math.PI * 2);
+                ctx.fillStyle = '#8B4513';
+                ctx.fill();
+                ctx.strokeStyle = '#654321';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+
+            function DibujarFlorSinTallo(x, y, NumeroPetalos, RadioXPetalo, RadioYPetalo, AltoTrazo) {
+                const AnguloIncrement = (Math.PI * 2) / NumeroPetalos;
+                for (let i = 0; i < NumeroPetalos; i++) {
+                    const Angulo = i * AnguloIncrement;
+                    DibujarPetalo(x, y, RadioXPetalo, 1.5, Angulo, 'yellow', 30);
+                }
+                ctx.beginPath();
+                ctx.arc(x, y, 10, 0, Math.PI * 2);
+                ctx.fillStyle = '#8B4513';
+                ctx.fill();
+                ctx.strokeStyle = '#654321';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+
+            function CrearVarias() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                const numFlores = 12;
+                const ancho = canvas.width;
+                const alto = canvas.height;
+                for (let i = 0; i < numFlores; i++) {
+                    const x = 100 + (i % 4) * (ancho / 4);
+                    const y = 100 + Math.floor(i / 4) * (alto / 3);
+                    DibujarFlorSinTallo(x, y, 8, 20, 20, 0);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
